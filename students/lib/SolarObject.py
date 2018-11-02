@@ -37,6 +37,7 @@ class SolarObject:
         self.orbit_inclination = ORBIT_INCLINATION
 
         self.rotation_inclination = ROTATION_INCLINATION
+        self.roation_duation = ROTATION_DURATION
 
         self.orbit_velocity = 0.001
         self.rotation_velocity = 0.001
@@ -74,19 +75,26 @@ class SolarObject:
         self.orbit_radius_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_radius_node")
         self.orbit_radius_node.Children.value = [self.object_geometry]
         self.orbit_radius_node.Transform.value = avango.gua.make_trans_mat(self.orbit_radius, 0.0, 0.0)
-        PARENT_NODE.Children.value.append(self.orbit_radius_node)
+
 
         ## TODO: create further scenegraph nodes below here
-
+        
         # init orbit inclination of solar object
         self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
         self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
-        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(45, 0, 0, 1) #set to self.orbit_inclination after testing
+        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 1, 0, 0)
         PARENT_NODE.Children.value.append(self.orbit_inclination_node)
+
+        # init rotation inclination of solar object
+        #self.rotation_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_rotation_inclination_node")
+        #self.rotation_inclination_node.Children.value = [self.orbit_inclination_node]
+        #self.rotation_inclination_node.Transform.value = avango.gua.make_rot_mat(self.rotation_inclination, 0, 1, 0)
+        #PARENT_NODE.Children.value.append(self.rotation_inclination_node)
+        
 
 
         ## TODO: create orbit visualization below here
-        self.earth_orbit = OrbitVisualization(
+        self.orbit_geometry = OrbitVisualization(
             PARENT_NODE = PARENT_NODE,
             ORBIT_RADIUS = ORBIT_RADIUS
             )
@@ -109,6 +117,9 @@ class SolarObject:
     def update_rotation(self):
         pass
         ## TODO: fill this function with code
+        #self.rotation_inclination_node.Transform.value = \
+        #avango.gua.make_rot_mat(self.rotation_velocity * sf_time_scale_factor.value, 0.0, 1.0, 0.0) * \
+        #self.rotation_inclination_node.Transform.value
 
 
     ### callback functions ###
