@@ -34,6 +34,7 @@ class SolarObject:
 
         self.diameter = DIAMETER
         self.orbit_radius = ORBIT_RADIUS
+        self.orbit_inclination = ORBIT_INCLINATION
 
         self.rotation_inclination = ROTATION_INCLINATION
 
@@ -68,7 +69,6 @@ class SolarObject:
         self.axis_green_geometry.ShadowMode.value = avango.gua.ShadowMode.OFF # geometry does not cast shadows
         
         
-        
         # init transformation nodes for specific solar object aspects
 
         self.orbit_radius_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_radius_node")
@@ -78,9 +78,18 @@ class SolarObject:
 
         ## TODO: create further scenegraph nodes below here
 
+        # init orbit inclination of solar object
+        self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
+        self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
+        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(45, 0, 0, 1) #set to self.orbit_inclination after testing
+        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
 
 
         ## TODO: create orbit visualization below here
+        self.earth_orbit = OrbitVisualization(
+            PARENT_NODE = PARENT_NODE,
+            ORBIT_RADIUS = ORBIT_RADIUS
+            )
 
         # Triggers framewise evaluation of respective callback method
         self.frame_trigger = avango.script.nodes.Update(Callback = self.frame_callback, Active = True)

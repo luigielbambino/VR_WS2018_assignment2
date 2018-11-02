@@ -75,7 +75,7 @@ class SolarSystem(avango.script.Script):
             ROTATION_INCLINATION = SP.EARTH_ROTATION_INCLINATION,
             ROTATION_DURATION = SP.EARTH_ROTATION_DURATION,
             )
-
+        
         self.earth_moon = SolarObject(
             NAME = "earth moon",
             TEXTURE_PATH = SP.EARTH_MOON_TEXTURE,
