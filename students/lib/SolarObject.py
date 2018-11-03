@@ -69,11 +69,19 @@ class SolarObject:
         self.axis_green_geometry.Material.value.set_uniform("Emissivity", 1.0) # no shading
         self.axis_green_geometry.ShadowMode.value = avango.gua.ShadowMode.OFF # geometry does not cast shadows
         
+
+        # init rotation inclination of solar object
+        self.rotation_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_rotation_inclination_node")
+        #self.rotation_inclination_node.Children.value = [self.orbit_inclination_node]
+        self.rotation_inclination_node.Children.value = [self.object_geometry]
+        self.rotation_inclination_node.Transform.value = avango.gua.make_rot_mat(self.rotation_inclination, 0, 1, 0)
+        
+
         
         # init transformation nodes for specific solar object aspects
 
         self.orbit_radius_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_radius_node")
-        self.orbit_radius_node.Children.value = [self.object_geometry]
+        self.orbit_radius_node.Children.value = [self.rotation_inclination_node]
         self.orbit_radius_node.Transform.value = avango.gua.make_trans_mat(self.orbit_radius, 0.0, 0.0)
 
 
@@ -83,14 +91,10 @@ class SolarObject:
         self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
         self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
         self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 1, 0, 0)
-        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
+        #PARENT_NODE.Children.value.append(self.orbit_inclination_node)
 
-        # init rotation inclination of solar object
-        #self.rotation_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_rotation_inclination_node")
-        #self.rotation_inclination_node.Children.value = [self.orbit_inclination_node]
-        #self.rotation_inclination_node.Transform.value = avango.gua.make_rot_mat(self.rotation_inclination, 0, 1, 0)
-        #PARENT_NODE.Children.value.append(self.rotation_inclination_node)
-        
+
+        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
 
 
         ## TODO: create orbit visualization below here
