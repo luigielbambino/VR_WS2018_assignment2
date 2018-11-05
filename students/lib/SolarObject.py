@@ -39,8 +39,8 @@ class SolarObject:
         self.rotation_inclination = ROTATION_INCLINATION
         self.roation_duation = ROTATION_DURATION
 
-        self.orbit_velocity = 0.001 * ORBIT_DURATION
-        self.rotation_velocity = 0.001 * ROTATION_DURATION
+        self.orbit_velocity = 0.001 * ROTATION_DURATION
+        self.rotation_velocity = 0.001 * ORBIT_DURATION
 
 
         ### resources ###
@@ -56,6 +56,13 @@ class SolarObject:
         if NAME == "sun":
             self.object_geometry.Material.value.set_uniform("Emissivity", 1.0)
             
+
+        self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
+        
+        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 0, 1, 0)
+
+
+        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
 
         self.axis_red_geometry = _loader.create_geometry_from_file(NAME + "_axis_red", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.axis_red_geometry.Transform.value = avango.gua.make_scale_mat(0.001,self.diameter*2.5,0.001)
@@ -82,21 +89,16 @@ class SolarObject:
         self.orbit_radius_node.Children.value = [self.rotation_inclination_node, self.axis_red_geometry]
         self.orbit_radius_node.Transform.value = avango.gua.make_trans_mat(self.orbit_radius, 0.0, 0.0)
 
-
+        self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
         ## TODO: create further scenegraph nodes below here
         
         # init orbit inclination of solar object
-        self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
-        self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
-        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 0, 1, 0)
 
-
-        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
 
 
         ## TODO: create orbit visualization below here
         self.orbit_geometry = OrbitVisualization(
-            PARENT_NODE = PARENT_NODE,
+            PARENT_NODE = self.orbit_inclination_node,
             ORBIT_RADIUS = ORBIT_RADIUS,
             )
 
