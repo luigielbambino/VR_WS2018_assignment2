@@ -39,8 +39,8 @@ class SolarObject:
         self.rotation_inclination = ROTATION_INCLINATION
         self.roation_duation = ROTATION_DURATION
 
-        self.orbit_velocity = 0.001
-        self.rotation_velocity = 0.001
+        self.orbit_velocity = 0.001 * ORBIT_DURATION
+        self.rotation_velocity = 0.001 * ROTATION_DURATION
 
 
         ### resources ###
@@ -57,13 +57,13 @@ class SolarObject:
             self.object_geometry.Material.value.set_uniform("Emissivity", 1.0)
             
 
-        self.axis_red_geometry = _loader.create_geometry_from_file("axis_red", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.axis_red_geometry = _loader.create_geometry_from_file(NAME + "_axis_red", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.axis_red_geometry.Transform.value = avango.gua.make_scale_mat(0.001,self.diameter*2.5,0.001)
         self.axis_red_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
         self.axis_red_geometry.Material.value.set_uniform("Emissivity", 1.0) # no shading
         self.axis_red_geometry.ShadowMode.value = avango.gua.ShadowMode.OFF # geometry does not cast shadows
 
-        self.axis_green_geometry = _loader.create_geometry_from_file("axis_green", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.axis_green_geometry = _loader.create_geometry_from_file(NAME + "_axis_green", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.axis_green_geometry.Transform.value = avango.gua.make_scale_mat(0.001,self.diameter*2.5,0.001)
         self.axis_green_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.0, 1.0, 0.0, 1.0))
         self.axis_green_geometry.Material.value.set_uniform("Emissivity", 1.0) # no shading
@@ -72,16 +72,14 @@ class SolarObject:
 
         # init rotation inclination of solar object
         self.rotation_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_rotation_inclination_node")
-        #self.rotation_inclination_node.Children.value = [self.orbit_inclination_node]
-        self.rotation_inclination_node.Children.value = [self.object_geometry]
-        self.rotation_inclination_node.Transform.value = avango.gua.make_rot_mat(self.rotation_inclination, 0, 1, 0)
+        self.rotation_inclination_node.Children.value = [self.object_geometry, self.axis_green_geometry]
+        self.rotation_inclination_node.Transform.value = avango.gua.make_rot_mat(self.rotation_inclination, 1, 0, 0)
         
 
-        
         # init transformation nodes for specific solar object aspects
 
         self.orbit_radius_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_radius_node")
-        self.orbit_radius_node.Children.value = [self.rotation_inclination_node]
+        self.orbit_radius_node.Children.value = [self.rotation_inclination_node, self.axis_red_geometry]
         self.orbit_radius_node.Transform.value = avango.gua.make_trans_mat(self.orbit_radius, 0.0, 0.0)
 
 
@@ -90,8 +88,7 @@ class SolarObject:
         # init orbit inclination of solar object
         self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
         self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
-        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 1, 0, 0)
-        #PARENT_NODE.Children.value.append(self.orbit_inclination_node)
+        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 0, 1, 0)
 
 
         PARENT_NODE.Children.value.append(self.orbit_inclination_node)
@@ -100,7 +97,7 @@ class SolarObject:
         ## TODO: create orbit visualization below here
         self.orbit_geometry = OrbitVisualization(
             PARENT_NODE = PARENT_NODE,
-            ORBIT_RADIUS = ORBIT_RADIUS
+            ORBIT_RADIUS = ORBIT_RADIUS,
             )
 
         # Triggers framewise evaluation of respective callback method
@@ -119,11 +116,10 @@ class SolarObject:
 
 
     def update_rotation(self):
-        pass
         ## TODO: fill this function with code
-        #self.rotation_inclination_node.Transform.value = \
-        #avango.gua.make_rot_mat(self.rotation_velocity * sf_time_scale_factor.value, 0.0, 1.0, 0.0) * \
-        #self.rotation_inclination_node.Transform.value
+        self.rotation_inclination_node.Transform.value = \
+        avango.gua.make_rot_mat(self.rotation_velocity * self.sf_time_scale_factor.value, 0.0, 1.0, 0.0) * \
+        self.rotation_inclination_node.Transform.value
 
 
     ### callback functions ###

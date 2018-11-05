@@ -13,7 +13,7 @@ from lib.Utilities import *
 
 ### global variables ###
 NAVIGATION_MODE = "Spacemouse"
-NAVIGATION_MODE = "Keyboard"
+#NAVIGATION_MODE = "Keyboard"
 
 
 def start():
