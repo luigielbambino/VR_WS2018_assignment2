@@ -57,12 +57,7 @@ class SolarObject:
             self.object_geometry.Material.value.set_uniform("Emissivity", 1.0)
             
 
-        self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
-        
-        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 0, 1, 0)
 
-
-        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
 
         self.axis_red_geometry = _loader.create_geometry_from_file(NAME + "_axis_red", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.axis_red_geometry.Transform.value = avango.gua.make_scale_mat(0.001,self.diameter*2.5,0.001)
@@ -89,7 +84,12 @@ class SolarObject:
         self.orbit_radius_node.Children.value = [self.rotation_inclination_node, self.axis_red_geometry]
         self.orbit_radius_node.Transform.value = avango.gua.make_trans_mat(self.orbit_radius, 0.0, 0.0)
 
+        
+        self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_inclination_node")
+        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(self.orbit_inclination, 1, 0, 0)
         self.orbit_inclination_node.Children.value = [self.orbit_radius_node]
+
+        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
         ## TODO: create further scenegraph nodes below here
         
         # init orbit inclination of solar object
@@ -99,7 +99,7 @@ class SolarObject:
         ## TODO: create orbit visualization below here
         self.orbit_geometry = OrbitVisualization(
             PARENT_NODE = self.orbit_inclination_node,
-            ORBIT_RADIUS = ORBIT_RADIUS,
+            ORBIT_RADIUS = self.orbit_radius,
             )
 
         # Triggers framewise evaluation of respective callback method
@@ -120,8 +120,8 @@ class SolarObject:
     def update_rotation(self):
         ## TODO: fill this function with code
         self.rotation_inclination_node.Transform.value = \
-        avango.gua.make_rot_mat(self.rotation_velocity * self.sf_time_scale_factor.value, 0.0, 1.0, 0.0) * \
-        self.rotation_inclination_node.Transform.value
+            avango.gua.make_rot_mat(self.rotation_velocity * self.sf_time_scale_factor.value, 0.0, 1.0, 0.0) * \
+            self.rotation_inclination_node.Transform.value
 
 
     ### callback functions ###
